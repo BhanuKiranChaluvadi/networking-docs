@@ -11,6 +11,7 @@ Welcome to networking's documentation!
    :caption: Contents:
 
    route_table_explanation
+   network_packet_flow
 
 Indices and tables
 ==================
