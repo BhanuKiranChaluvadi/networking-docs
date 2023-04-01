@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Route Table Explanation &#8212; networking 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to networking’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="route-table-explanation">
+<h1>Route Table Explanation<a class="headerlink" href="#route-table-explanation" title="Permalink to this headline">¶</a></h1>
+<p>The route table shows the routing configuration for a Linux system with
+multiple network interfaces. Each line represents a routing rule, describing
+how to reach a specific network destination.</p>
+<div class="section" id="route-table-entries">
+<h2>Route Table Entries<a class="headerlink" href="#route-table-entries" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ip<span class="w"> </span>route<span class="w"> </span>show
+default<span class="w"> </span>via<span class="w"> </span><span class="m">10</span>.53.252.1<span class="w"> </span>dev<span class="w"> </span>eno1<span class="w"> </span>proto<span class="w"> </span>dhcp<span class="w"> </span>metric<span class="w"> </span><span class="m">100</span>
+<span class="m">10</span>.53.252.0/22<span class="w"> </span>dev<span class="w"> </span>eno1<span class="w"> </span>proto<span class="w"> </span>kernel<span class="w"> </span>scope<span class="w"> </span>link<span class="w"> </span>src<span class="w"> </span><span class="m">10</span>.53.253.141<span class="w"> </span>metric<span class="w"> </span><span class="m">100</span>
+<span class="m">169</span>.254.0.0/16<span class="w"> </span>dev<span class="w"> </span>eno1<span class="w"> </span>scope<span class="w"> </span>link<span class="w"> </span>metric<span class="w"> </span><span class="m">1000</span>
+<span class="m">172</span>.17.0.0/16<span class="w"> </span>dev<span class="w"> </span>docker0<span class="w"> </span>proto<span class="w"> </span>kernel<span class="w"> </span>scope<span class="w"> </span>link<span class="w"> </span>src<span class="w"> </span><span class="m">172</span>.17.0.1<span class="w"> </span>linkdown
+<span class="m">172</span>.20.0.0/16<span class="w"> </span>dev<span class="w"> </span>br-f51682b1a7dc<span class="w"> </span>proto<span class="w"> </span>kernel<span class="w"> </span>scope<span class="w"> </span>link<span class="w"> </span>src<span class="w"> </span><span class="m">172</span>.20.0.1
+</pre></div>
+</div>
+<div class="section" id="default-gateway">
+<h3>1. Default Gateway<a class="headerlink" href="#default-gateway" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>::</dt><dd><p>default via 10.53.252.1 dev eno1 proto dhcp metric 100</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><strong>default</strong>: The default route.</p></li>
+<li><p><strong>via 10.53.252.1</strong>: The IP address of the gateway.</p></li>
+<li><p><strong>dev eno1</strong>: The network interface to use (eno1).</p></li>
+<li><p><strong>proto dhcp</strong>: The route was learned through DHCP.</p></li>
+<li><p><strong>metric 100</strong>: Priority assigned to this route. Lower values have
+higher priority.</p></li>
+</ul>
+<p><strong>Example</strong>: If the system needs to reach an IP address like 8.8.8.8
+(not explicitly defined in the routing table), it will use the default
+route and forward the packet to 10.53.252.1 via the eno1 interface.</p>
+</div>
+<div class="section" id="local-network-route">
+<h3>2. Local Network Route<a class="headerlink" href="#local-network-route" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>::</dt><dd><p>10.53.252.0/22 dev eno1 proto kernel scope link src 10.53.253.141 metric 100</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><strong>10.53.252.0/22</strong>: Destination network address and subnet mask
+(255.255.252.0).</p></li>
+<li><p><strong>dev eno1</strong>: The network interface to use (eno1).</p></li>
+<li><p><strong>proto kernel</strong>: The route was added by the kernel.</p></li>
+<li><p><strong>scope link</strong>: The destination is directly reachable.</p></li>
+<li><p><strong>src 10.53.253.141</strong>: Source IP address used when sending packets.</p></li>
+<li><p><strong>metric 100</strong>: Priority assigned to this route.</p></li>
+</ul>
+<p><strong>Example</strong>: If the system needs to reach an IP address like 10.53.252.5,
+it will use this route and send the packet directly via the eno1
+interface with a source IP of 10.53.253.141.</p>
+</div>
+<div class="section" id="link-local-network-route">
+<h3>3. Link-Local Network Route<a class="headerlink" href="#link-local-network-route" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>::</dt><dd><p>169.254.0.0/16 dev eno1 scope link metric 1000</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><strong>169.254.0.0/16</strong>: Destination network address and subnet mask
+(255.255.0.0) for link-local addresses (RFC 3927).</p></li>
+<li><p><strong>dev eno1</strong>: The network interface to use (eno1).</p></li>
+<li><p><strong>scope link</strong>: The destination is directly reachable.</p></li>
+<li><p><strong>metric 1000</strong>: Priority assigned to this route.</p></li>
+</ul>
+<p><strong>Example</strong>: If the system needs to reach an IP address like 169.254.1.2,
+it will use this route and send the packet directly via the eno1 interface.</p>
+</div>
+<div class="section" id="docker-network-route">
+<h3>4. Docker Network Route<a class="headerlink" href="#docker-network-route" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>::</dt><dd><p>172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><strong>172.17.0.0/16</strong>: Destination network address and subnet mask (255.255.0.0).</p></li>
+<li><p><strong>dev docker0</strong>: The network interface to use (docker0).</p></li>
+<li><p><strong>proto kernel</strong>: The route was added by the kernel.</p></li>
+<li><p><strong>scope link</strong>: The destination is directly reachable.</p></li>
+<li><p><strong>src 172.17.0.1</strong>: Source IP address used when sending packets.</p></li>
+<li><p><strong>linkdown</strong>: The network interface (docker0) is currently down or
+not operational.</p></li>
+</ul>
+<p><strong>Example</strong>: If the system needs to reach an IP address like 172.17.0.2
+and the docker0 interface is up, it will use this route and send the packet
+directly via the docker0 interface with a source IP of 172.17.0.1.
+However, since the interface is currently down</p>
+</div>
+<div class="section" id="bridge-network-route">
+<h3>5. Bridge Network Route<a class="headerlink" href="#bridge-network-route" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>::</dt><dd><p>172.20.0.0/16 dev br-f51682b1a7dc proto kernel scope link src 172.20.0.1</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><strong>172.20.0.0/16</strong>: Destination network address and subnet mask (255.255.0.0).</p></li>
+<li><p><strong>dev br-f51682b1a7dc</strong>: The network interface to use (br-f51682b1a7dc).</p></li>
+<li><p><strong>proto kernel</strong>: The route was added by the kernel.</p></li>
+<li><p><strong>scope link</strong>: The destination is directly reachable.</p></li>
+<li><p><strong>src 172.20.0.1</strong>: Source IP address used when sending packets.</p></li>
+</ul>
+<p><strong>Example</strong>: If the system needs to reach an IP address like 172.20.0.2,
+it will use this route and send the packet directly via the br-f51682b1a7dc
+interface with a source IP of 172.20.0.1.</p>
+</div>
+<div class="section" id="summary">
+<h3>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
+<p>This route table defines the routing behavior for a system with multiple
+network interfaces, including a physical interface (eno1), a Docker interface
+(docker0), and a bridge interface (br-f51682b1a7dc). The table specifies how
+to reach different network destinations, whether they are local networks,
+link-local networks, or external networks.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">networking</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Route Table Explanation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#route-table-entries">Route Table Entries</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to networking’s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Bhanu Kiran Chaluvadi.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/route_table_explanation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
